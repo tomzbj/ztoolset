@@ -14,56 +14,54 @@ murphyzhao的FlexibleButton是一个强大的按键处理库, 链接: https://gi
 
 ## 使用方法
 
-两个回调函数如下, 这里用PA2和PA3两个GPIO作为按键:
+    两个回调函数如下, 这里用PA0和PB11两个GPIO作为按键:
 
-    // 读键
+    static int key_read(int key_id);
+    static void key_action(int key_id, int action);
+
+    static ZKey::cbs_t cbs = {key_read, key_action};
+
+    int key_count[2], key_state[2];
+    // 长按阈值为300ms
+    ZKey zk(cbs, 2, 300, key_count, key_state);
+
+    enum { KEY_TOP = 0, KEY_BOTTOM = 1 };
+
     static int key_read(int key_id)
     {
-        unsigned short keys[2] = {GPIO_Pin_2, GPIO_Pin_3};
-        if((GPIOA->IDR & keys[key_id]) == 0)
-            return 1;
-        else
-            return 0;
+        //  const zpin_t keys[2] = {PA0, PB11};
+        if(key_id == 0)
+            return ZPin::read(PA0);
+        else if(key_id == 1)
+            return !ZPin::read(PB11);
+        return 0;
     }
 
-    // 按键事件处理
-    static void key_action(int key_id, zk_action_t action)
+    constexpr static int hash(int key_id, int action)
     {
-        if(action == ZK_LONGPRESS) {
-            switch(key_id) {
-                case 0: printf("key1 longpressed.\n"); break;
-                case 1: printf("key2 longpressed.\n"); break;
-            }
-        }
-        if(action == ZK_PRESS) {
-            switch(key_id) {
-                case 0: printf("key1 press\n"); break;
-                case 1: printf("key2 press\n"); break;
-            }
-        }
-        if(action == ZK_CLICK) {
-            switch(key_id) {
-                case 0: printf("key1 click\n"); break;
-                case 1: printf("key2 click\n"); break;
-            }
-        }
+        return key_id * 100 + action;
     }
 
-初始化:
-
-    void KEY_Config(void)
+    static void key_action(int key_id, int action)
     {
-        zk_t zk;
-        static int count[2];        // 按键计数器, 用户提供
-        static int state[2];        // 按键状态记录, 用户提供
-        zk.read_f = key_read;
-        zk.action_f = key_action;
-        zk.key_num = 2;
-        zk.key_count = count;
-        zk.key_state = state;
-        zk.longpress_count = 300;   // 长按阈值为300ms (zt_poll()每1ms执行一次的话)
-        zk_init(&zk);
+        extern class ZEVENT ze;
+        switch(hash(key_id, action)) {
+            case hash(KEY_TOP, ZKey::PRESS):
+                ze.post(EVENTS::KEY_TOP_PRESSED);
+                break;
+            case hash(KEY_TOP, ZKey::LONGPRESS):
+                ze.post(EVENTS::KEY_TOP_LONGPRESSED);
+                break;
+            case hash(KEY_BOTTOM, ZKey::PRESS):
+                ze.post(EVENTS::KEY_BOTTOM_PRESSED);
+                break;
+            case hash(KEY_BOTTOM, ZKey::LONGPRESS):
+                ze.post(EVENTS::KEY_BOTTOM_LONGPRESSED);
+                break;
+    }
     }
 
-轮询: 每1ms执行一次zk_poll()即可. 如果按键响应处理耗时较长, 则不要放在SysTick中断中执行, 可以用其他调度器来调度zk_poll().    
+初始化: 把用到的两个按键对应的gpio初始化为上拉输入即可.
+
+轮询: 每1ms执行一次zk.poll()即可. 如果按键响应处理耗时较长, 则不要放在SysTick中断中执行, 可以用其他调度器来调度zk.poll().    
     
