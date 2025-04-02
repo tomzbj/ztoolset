@@ -15,3 +15,5 @@ zpin: 统一的gpio读写操作, 详见[zpin/README.md](zpin/README.md).
 zi2c: 软件i2c主机库, 详见[zi2c/README.md](zi2c/README.md).
 
 zfifo: 抄了一下kfifo, 详见[zfifo/README.md](zfifo/README.md).
+
+zromfs: romfs文件系统库, 详见[zromfs/README.md](zromfs/README.md).
