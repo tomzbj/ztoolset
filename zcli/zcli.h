@@ -4,6 +4,7 @@
 #define _ZCLI_H
 
 #include <cctype>
+#include <memory>
 
 class ZCli {
   public:
@@ -12,7 +13,7 @@ class ZCli {
 
     ZCli(int max_cmds)
     {
-      _cmd = new cmd_t[max_cmds];
+      _cmd = std::make_unique<cmd_t[]>(max_cmds);
       _num_cmds = 0;
       _max_cmds = max_cmds;
     }
@@ -34,25 +35,25 @@ class ZCli {
     {
       const char* msg = (const char*)pmsg;
       const char* tokens[8], * token;
-      char seps[] = "? ,#\r\n", string[MSG_LEN];
+      char seps[] = "? ,#\r\n";
       int i, len, count = 0;
 
-      bzero(string, MSG_LEN);
-      strncpy(string, msg, size);
+      auto string = std::make_unique<char[]>(size);
+
+      strncpy(string.get(), msg, size);
       for(i = 0; i < size; i++) {
         if(isalpha((int)string[i]))
           string[i] = toupper((int)string[i]);
       }
 
-      len = strlen(string);
+      len = strlen(string.get());
       while(string[len - 1] == '\n' || string[len - 1] == '\r') {
         string[len - 1] = '\0';
         len--;
       }
 
-      token = strtok(string, seps);
+      token = strtok(string.get(), seps);
       while(token != NULL) {
-
         tokens[count] = token;
         count++;
         token = strtok(NULL, seps);    // Get next token:
@@ -82,9 +83,8 @@ class ZCli {
         const char* name;
     } cmd_t;
 
-    cmd_t* _cmd;
+    std::unique_ptr<cmd_t[]> _cmd;
     int _num_cmds, _max_cmds;
-    const int MSG_LEN = 256;
 };
 
 #endif
