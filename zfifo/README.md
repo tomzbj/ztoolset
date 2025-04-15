@@ -4,10 +4,9 @@
 
 使用方法:
 
-初始化: 预先提供缓冲区, 传入缓冲区地址和尺寸, 从而避免了动态内存分配.
+初始化: 提供缓冲区尺寸即可.
 
-    uint8_t fifo_workbuf[1024];
-    ZFIFO fifo(fifo_workbuf, sizeof(fifo_workbuf));
+    ZFIFO fifo(1024);
 
 peek: 查看fifo的首字节.  
 traverse: 对fifo每个元素调用printf, 需要传入printf的函数指针(方便使用自行实现的printf.)  

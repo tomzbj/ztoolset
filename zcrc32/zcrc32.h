@@ -9,7 +9,6 @@
 
 class ZCRC32 {
   public:
-
     static uint32_t calc(const void* msg, int size)
     {
       return calc(0xffffffff, msg, size);
@@ -23,7 +22,6 @@ class ZCRC32 {
 #ifdef ZCRC32_LUT
       return calc_lut(crc, msg, size);
 #endif
-
     }
 
     static uint32_t calc_soft(uint32_t crc, const void* pmsg, int size)
@@ -51,9 +49,7 @@ class ZCRC32 {
       return crc;
     }
 
-
   private:
-
     constexpr static uint32_t crc32_tab[256] = {
       //
       0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
@@ -101,7 +97,6 @@ class ZCRC32 {
       0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d    //
       };
 #endif
-
 };
 
 #endif
