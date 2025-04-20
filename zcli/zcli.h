@@ -38,7 +38,7 @@ class ZCli {
       char seps[] = "? ,#\r\n";
       int i, len, count = 0;
 
-      auto string = std::make_unique<char[]>(size);
+      auto string = std::make_unique<char[]>(size + 2);
 
       strncpy(string.get(), msg, size);
       for(i = 0; i < size; i++) {
