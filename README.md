@@ -19,3 +19,5 @@ zfifo: 抄了一下kfifo, 详见[zfifo/README.md](zfifo/README.md).
 zromfs: romfs文件系统库, 详见[zromfs/README.md](zromfs/README.md).
 
 zuart: 简单的串口收发库, 详见[zuart/README.md](zuart/README.md).
+
+zcharlie: 查理复用式数码管驱动, 详见[zcharlie/README.md](zcharlie/README.md).
